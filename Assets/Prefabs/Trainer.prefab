@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 2127918788104430419}
   - component: {fileID: 2127918788104430416}
   m_Layer: 0
-  m_Name: SM_Trainer
+  m_Name: Trainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -272,6 +272,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 2127918788104430416}
+  mainCamera: {fileID: 0}
+  playerAnimator: {fileID: 0}
+  speed: 2
+  runSpeed: 5
+  jumpHeight: 20
 --- !u!143 &2127918788104430416
 CharacterController:
   m_ObjectHideFlags: 0

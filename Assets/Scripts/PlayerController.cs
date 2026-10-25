@@ -15,13 +15,20 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Insert Main Camera")]
     private Camera mainCamera;
     
+    [SerializeField]
+    [Tooltip("Insert Animator Controller")]
+    private Animator playerAnimator;
+    
     private Vector3 velocity;
     private bool grounded;
     private float gravity = -9.8f;
     private float groundCastDist = 0.05f;
 
-    public float speed = 5f;
-    public float jumpHeight = 10f;
+    public float speed = 2f;
+    public float runSpeed = 5f;
+    public float jumpHeight = 20f;
+
+    private bool throwing = false;
     
     // Start is called before the first frame update
     void Start()
@@ -55,19 +62,50 @@ public class PlayerController : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         Vector3 movement = (playerTransform.right * x) + (playerTransform.forward * z);
-        controller.Move(movement * speed * Time.deltaTime);
+        
+        // Throw
+        if (Input.GetButtonDown("Fire") && grounded)
+        {
+            throwing = true;
+            playerAnimator.SetBool("IsThrowing", true);
+        }
+        
+        // Apply movement
+        if (!throwing)
+        {
+            // Regular movement and running
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                controller.Move(movement * runSpeed * Time.deltaTime);
+                playerAnimator.SetBool("IsRunning", true);
+            }
+            else
+            {
+                controller.Move(movement * speed * Time.deltaTime);
+                playerAnimator.SetBool("IsRunning", false);
+            }
+            
+            // Gravity and jumping
+            velocity.y += gravity * Time.deltaTime;
+            if (Input.GetButtonDown("Jump") && grounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight);
+            }
+            controller.Move(velocity * Time.deltaTime);
+            playerAnimator.SetBool("IsJumping", !grounded);
+        }
+        
+        if (movement.magnitude > 0)
+        {
+            playerAnimator.SetBool("IsWalking", true);
+        }
+        else
+        {
+            playerAnimator.SetBool("IsWalking", false);
+        }
         
         // Rotate alongside the camera
         playerTransform.rotation = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up);
-        
-        // Gravity and jumping
-        velocity.y += gravity * Time.deltaTime;
-        if (Input.GetButtonDown("Jump") && grounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight);
-        }
-        controller.Move(velocity * Time.deltaTime);
-        
     }
 
     private void OnApplicationFocus(bool hasFocus)
