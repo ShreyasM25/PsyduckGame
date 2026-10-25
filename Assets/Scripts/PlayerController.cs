@@ -19,6 +19,14 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Insert Animator Controller")]
     private Animator playerAnimator;
     
+    [SerializeField]
+    [Tooltip("Insert Pokeball Prefab")]
+    private GameObject pokeBallPF;
+    
+    [SerializeField]
+    [Tooltip("Insert Pokeball Bone Transform")]
+    private Transform pokeBallBone;
+    
     private Vector3 velocity;
     private bool grounded;
     private float gravity = -9.8f;
@@ -29,6 +37,8 @@ public class PlayerController : MonoBehaviour
     public float jumpHeight = 20f;
 
     private bool throwing = false;
+    public float throwStrength = 4f;
+    private GameObject instantiatedPokeball;
     
     // Start is called before the first frame update
     void Start()
@@ -64,9 +74,10 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = (playerTransform.right * x) + (playerTransform.forward * z);
         
         // Throw
-        if (Input.GetButtonDown("Fire") && grounded)
+        if (Input.GetButtonDown("Fire1") && grounded)
         {
             throwing = true;
+            SpawnPokeballToBone();
             playerAnimator.SetBool("IsThrowing", true);
         }
         
@@ -106,6 +117,35 @@ public class PlayerController : MonoBehaviour
         
         // Rotate alongside the camera
         playerTransform.rotation = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up);
+    }
+
+    public void ThrowEnded()
+    {
+        throwing = false;
+        playerAnimator.SetBool("IsThrowing", false);
+    }
+
+    private void SpawnPokeballToBone()
+    {
+        if (instantiatedPokeball is null)
+        {
+            instantiatedPokeball = Instantiate(pokeBallPF, pokeBallBone, false);
+        }
+    }
+
+    public void ReleasePokeball()
+    {
+        if (instantiatedPokeball != null)
+        {
+            instantiatedPokeball.transform.parent = null;
+            instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
+            instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
+            Transform cameraTransform = mainCamera.transform;
+            Vector3 throwAdjustment = new Vector3(0f, 0.5f, 0f);
+            Vector3 throwVector = (cameraTransform.forward + throwAdjustment) * throwStrength;
+            instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
+            instantiatedPokeball = null;
+        }
     }
 
     private void OnApplicationFocus(bool hasFocus)
