@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,14 +11,17 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Insert Character Controller")]
     private CharacterController controller;
     
-    private Vector3 velocity;
-    public bool grounded;
+    [SerializeField]
+    [Tooltip("Insert Main Camera")]
+    private Camera mainCamera;
     
+    private Vector3 velocity;
+    private bool grounded;
     private float gravity = -9.8f;
     private float groundCastDist = 0.05f;
 
     public float speed = 5f;
-    public float jumpHeight = 4f;
+    public float jumpHeight = 10f;
     
     // Start is called before the first frame update
     void Start()
@@ -27,9 +31,12 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        // Grounded
+    { 
+        // Transform acquisition
         Transform playerTransform = transform;
+        Transform cameraTransform = mainCamera.transform;
+        
+        // Grounded
         grounded = Physics.Raycast(playerTransform.position, Vector3.down, groundCastDist);
         
         // DEBUG - Visualize raycast
@@ -50,6 +57,9 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = (playerTransform.right * x) + (playerTransform.forward * z);
         controller.Move(movement * speed * Time.deltaTime);
         
+        // Rotate alongside the camera
+        playerTransform.rotation = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up);
+        
         // Gravity and jumping
         velocity.y += gravity * Time.deltaTime;
         if (Input.GetButtonDown("Jump") && grounded)
@@ -58,5 +68,17 @@ public class PlayerController : MonoBehaviour
         }
         controller.Move(velocity * Time.deltaTime);
         
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
 }
