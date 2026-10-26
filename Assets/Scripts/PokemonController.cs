@@ -29,10 +29,13 @@ public class PokemonController : MonoBehaviour
     
     private GameObject trainer;
     private Animator pokemonAnimator;
+
+    private LevelManager levelmanager;
     
     // Start is called before the first frame update
     void Start()
-    { 
+    {
+        levelmanager = GameObject.Find("Level Manager").GetComponent<LevelManager>();
         trainer = GameObject.Find("Trainer");
         walkingSpeed = GetComponent<NavMeshAgent>().speed;
         pokemonAnimator = GetComponent<Animator>();
@@ -141,7 +144,7 @@ public class PokemonController : MonoBehaviour
 
     public void digCompleted()
     {
-        Destroy(gameObject);
+        levelmanager.removePokemon(gameObject, false);
     }
 
     void updatePokemonAnimator(bool saunter, bool flee, bool dig)
