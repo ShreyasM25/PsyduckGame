@@ -1,14 +1,23 @@
 fileFormatVersion: 2
-guid: 600bc46b47ff496499bc920cc452cce1
+guid: a9925dc32415cdf4aa66e6ac08be1ec4
 ModelImporter:
   serializedVersion: 21202
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      74: -6784866277733829334
+    second: Armature|_Open
+  - first:
+      74: -7643428952882733763
+    second: Armature|Close
+  - first:
+      74: 6224824746721569604
+    second: Armature|Wiggle
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Material #68
-    second: {fileID: 2100000, guid: 86f4a2f1edc514945a44241b5ff26c42, type: 2}
+      name: Material #68.001
+    second: {fileID: 2100000, guid: a186c5f110874874daf95ff317b417de, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
