@@ -41,7 +41,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1024097458365723651}
   - component: {fileID: 2066869425521067898}
+  - component: {fileID: 785480154637284366}
   - component: {fileID: 2043771188355243294}
+  - component: {fileID: 4284451298405381879}
   m_Layer: 0
   m_Name: PokeBall
   m_TagString: Untagged
@@ -82,6 +84,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &785480154637284366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395617044020899513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2205e4ceb9c78f446a27c9917864150c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pokeballAnimator: {fileID: 4284451298405381879}
+  pokeflashPF: {fileID: 5446477072189379434, guid: 59fa53c50a0f23a49b47661b2b239e94,
+    type: 3}
 --- !u!135 &2043771188355243294
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -95,6 +112,26 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.08
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &4284451298405381879
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395617044020899513}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e9cd84597babb684490ae360b2afaa02, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &441124191501827594
 GameObject:
   m_ObjectHideFlags: 0
