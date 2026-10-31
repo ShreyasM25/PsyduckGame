@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Analytics;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -40,10 +41,18 @@ public class PlayerController : MonoBehaviour
     public float throwStrength = 4f;
     private GameObject instantiatedPokeball;
     
+    [SerializeField] private AudioClip[] grassSounds;
+    [SerializeField] private AudioClip[] sandSounds;
+    private AudioSource playerAS1;
+    
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        playerAS1 = GetComponents<AudioSource>()[0];
+        playerAS1.volume = 0.3f;
+        playerAS1.spatialBlend = 1f;
     }
 
     // Update is called once per frame
@@ -89,11 +98,13 @@ public class PlayerController : MonoBehaviour
             {
                 controller.Move(movement * runSpeed * Time.deltaTime);
                 playerAnimator.SetBool("IsRunning", true);
+                playerAS1.volume = 0.25f; // Louder footsteps when running
             }
             else
             {
                 controller.Move(movement * speed * Time.deltaTime);
                 playerAnimator.SetBool("IsRunning", false);
+                playerAS1.volume = 0.10f;
             }
             
             // Gravity and jumping
@@ -158,5 +169,55 @@ public class PlayerController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+    
+    public float[] GetTextureMix(Vector3 playerPosition, Terrain terrain)
+    {
+        Vector3 terrainPosition = terrain.transform.position;
+        TerrainData terrainData = terrain.terrainData;
+
+        // Position of player in relation to terrain alphamap
+        int mapPositionX = Mathf.RoundToInt((playerPosition.x - terrainPosition.x) / terrainData.size.x *
+                                            terrainData.alphamapWidth);
+        int mapPositionZ = Mathf.RoundToInt((playerPosition.z - terrainPosition.z) / terrainData.size.z *
+                                            terrainData.alphamapHeight);
+
+        // 3D: 1st x, 2nd z, 3rd pct of the terrain layers (grass/sound) used
+        float[,,] splatMapData = terrainData.GetAlphamaps(mapPositionX, mapPositionZ, 1, 1);
+        
+        // Extract all the values into that cellmix converting 3D array to 1D array
+        float[] cellMix = new float[splatMapData.GetUpperBound(2) + 1];
+        for (int i = 0; i < cellMix.Length; i++)
+        {
+            cellMix[i] = splatMapData[0, 0, i];
+        }
+        return cellMix;
+    }
+
+    public string FootStepLayerName(Vector3 playerPosition, Terrain terrain)
+    {
+        float[] cellMix = GetTextureMix(playerPosition, terrain);
+        float strongestTexture = 0;
+        int maxIndex = 0;
+
+        for (int i = 0; i < cellMix.Length; i++)
+        {
+            if (cellMix[i] > strongestTexture)
+            {
+                strongestTexture = cellMix[i];
+                maxIndex = i;
+            }
+        }
+        return terrain.terrainData.terrainLayers[maxIndex].name;
+    }
+
+    public void footStep()
+    {
+        playerAS1.clip = grassSounds[Random.Range(0, grassSounds.Length)];
+        if (FootStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
+        {
+            playerAS1.clip = sandSounds[Random.Range(0, sandSounds.Length)];
+        }
+        playerAS1.Play();
     }
 }

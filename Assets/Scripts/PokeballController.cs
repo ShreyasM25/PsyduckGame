@@ -19,6 +19,15 @@ public class PokeballController : MonoBehaviour
     private bool escaped;
     private bool checkForEscape = true;
     private LevelManager levelmanager;
+
+    [SerializeField] private AudioClip clip_Hit;
+    [SerializeField] private AudioClip clip_Collision;
+    [SerializeField] private AudioClip clip_Wiggle;
+    [SerializeField] private AudioClip clip_Escape;
+    [SerializeField] private AudioClip clip_Success;
+    private AudioSource pokeballAS1;
+
+    private bool disableCollisionSounds;
     
     // Start is called before the first frame update
     void Start()
@@ -26,6 +35,11 @@ public class PokeballController : MonoBehaviour
         pokeballAnimator.speed = 0;
         trainer = GameObject.Find("Trainer").transform.Find("CameraFocus");
         levelmanager = GameObject.Find("Level Manager").GetComponent<LevelManager>();
+
+        pokeballAS1 = GetComponents<AudioSource>()[0];
+        pokeballAS1.volume = 0.25f;
+        pokeballAS1.spatialBlend = 1f;
+        pokeballAS1.maxDistance = 5f;
     }
 
     private void FixedUpdate()
@@ -126,6 +140,8 @@ public class PokeballController : MonoBehaviour
                         if (!didOnce)
                         { 
                             Instantiate(pokeflashPF, pokemon.transform.position, quaternion.identity);
+                            pokeballAS1.clip = clip_Escape;
+                            pokeballAS1.Play();
                             didOnce = true;
                         }
                         Destroy(gameObject);
@@ -133,8 +149,15 @@ public class PokeballController : MonoBehaviour
                     }
                     else
                     {
+                        if (!didOnce)
+                        {
+                            pokeballAS1.clip = clip_Success;
+                            pokeballAS1.Play();
+                            didOnce = true;
+                        }
                         levelmanager.removePokemon(pokemon, true);
                     }
+                    disableCollisionSounds = false;
                     break;
             }
         }
@@ -145,11 +168,25 @@ public class PokeballController : MonoBehaviour
         if (collision.gameObject.tag == "Pokemon" && pokemon is null)
         {
             pokemon = collision.gameObject;
+            pokeballAS1.clip = clip_Hit;
+            pokeballAS1.Play();
+            disableCollisionSounds = true;
         }
         if (collision.gameObject.name == "Terrain")
         {
             terrain = collision.gameObject;
+            if (!disableCollisionSounds)
+            {
+                pokeballAS1.clip = clip_Collision;
+                pokeballAS1.Play();
+            }
         }
+    }
+
+    public void wiggleSound()
+    {
+        pokeballAS1.clip = clip_Wiggle;
+        pokeballAS1.Play();
     }
     
     IEnumerator WaitForCheck(float seconds)
