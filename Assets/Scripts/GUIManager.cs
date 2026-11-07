@@ -6,6 +6,8 @@ using UnityEngine.UIElements;
 public class GUIManager : MonoBehaviour
 {
 
+    private bool remainingTime;
+    
     private GroupBox _timerGb;
     private Label _time;
 
@@ -16,6 +18,13 @@ public class GUIManager : MonoBehaviour
     private Button _returnButton;
 
     private LevelManager _levelmanager;
+
+    private bool playedMusic = false;
+    private bool playedPing = false;
+    [SerializeField] private AudioClip intenseMusic;
+    [SerializeField] private AudioClip timePing;
+    private AudioSource _cameraAs1;
+    private AudioSource _cameraAs2;
     
     // Start is called before the first frame update
     void Start()
@@ -37,14 +46,33 @@ public class GUIManager : MonoBehaviour
         
         SetDisplay(_reportGb, false);
         SetDisplay(_timerGb, true);
+        
+        _cameraAs1 = GameObject.Find("Main Camera").GetComponents<AudioSource>()[0];
+        _cameraAs2 = GameObject.Find("Main Camera").GetComponents<AudioSource>()[1];
     }
 
     // Update is called once per frame
     void Update()
     {
+        float remainingTime = _levelmanager.endTime - _levelmanager.currentTime;
+        
         if (GetDisplay())
         {
-            _time.text = (_levelmanager.endTime - _levelmanager.currentTime).ToString("0");
+            _time.text = remainingTime.ToString("0");
+        }
+
+        if (remainingTime < 10 && !playedMusic)
+        {
+            _time.style.color = Color.red;
+            _time.style.fontSize = 175;
+            playMusic();
+            playedMusic = true;
+        }
+        
+        if (remainingTime < 5 && !playedPing)
+        {
+            playPing();
+            playedPing = true;
         }
     }
 
@@ -106,5 +134,17 @@ public class GUIManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    private void playMusic()
+    {
+        _cameraAs1.clip = intenseMusic;
+        _cameraAs1.Play();
+    }
+
+    private void playPing()
+    {
+        _cameraAs2.clip = timePing;
+        _cameraAs2.Play();
     }
 }

@@ -148,8 +148,8 @@ public class PokeballController : MonoBehaviour
                             _pokeballAs1.clip = clipSuccess;
                             _pokeballAs1.Play();
                             _didOnce = true;
+                            _levelmanager.RemovePokemon(_pokemon, true);
                         }
-                        _levelmanager.RemovePokemon(_pokemon, true);
                     }
                     _disableCollisionSounds = false;
                     break;

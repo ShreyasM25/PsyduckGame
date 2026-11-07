@@ -75,7 +75,7 @@ public class MasterballController : MonoBehaviour
                     }
                     _pokemon.SetActive(false);
                     if (pokeballAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f &&
-                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_MasterBall_Open"))
+                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_Masterball_Open"))
                     {
                         _animationStage = 3;   
                     }
@@ -84,7 +84,7 @@ public class MasterballController : MonoBehaviour
                 case 3: // Close pokeball
                     pokeballAnimator.SetInteger(State, 1);
                     if (pokeballAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f &&
-                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_MasterBall_Close"))
+                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_Masterball_Close"))
                     {
                         _animationStage = 4;
                         _terrain = null;
@@ -120,7 +120,7 @@ public class MasterballController : MonoBehaviour
                     }
                     
                     if (pokeballAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3.0f &&
-                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_MasterBall_Wiggle"))
+                        pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_Masterball_Wiggle"))
                     {
                         pokeballAnimator.speed = 0;
                         _didOnce = false;
