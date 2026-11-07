@@ -1,13 +1,15 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Analytics;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
+// ReSharper disable All
 
 public class PlayerController : MonoBehaviour
 {
-    
+    private static readonly int IsThrowing = Animator.StringToHash("IsThrowing");
+    private static readonly int IsRunning = Animator.StringToHash("IsRunning");
+    private static readonly int IsJumping = Animator.StringToHash("IsJumping");
+    private static readonly int IsWalking = Animator.StringToHash("IsWalking");
+
     [SerializeField]
     [Tooltip("Insert Character Controller")]
     private CharacterController controller;
@@ -20,39 +22,49 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Insert Animator Controller")]
     private Animator playerAnimator;
     
+    [FormerlySerializedAs("pokeBallPF")]
     [SerializeField]
     [Tooltip("Insert Pokeball Prefab")]
-    private GameObject pokeBallPF;
+    private GameObject pokeBallPf;
+    
+    [SerializeField]
+    [Tooltip("Insert Pokeball Prefab")]
+    private GameObject masterBallPf;
+    
+    [SerializeField]
+    [Tooltip("Insert Pokeball Prefab")]
+    private GameObject usedPokeBallPf;
     
     [SerializeField]
     [Tooltip("Insert Pokeball Bone Transform")]
     private Transform pokeBallBone;
     
-    private Vector3 velocity;
-    private bool grounded;
-    private float gravity = -9.8f;
-    private float groundCastDist = 0.05f;
+    private Vector3 _velocity;
+    private bool _grounded;
+    private readonly float _gravity = -9.8f;
+    private readonly float _groundCastDist = 0.05f;
 
     public float speed = 2f;
     public float runSpeed = 5f;
     public float jumpHeight = 20f;
 
-    private bool throwing = false;
+    // ReSharper disable once RedundantDefaultMemberInitializer
+    private bool _throwing = false;
     public float throwStrength = 4f;
-    private GameObject instantiatedPokeball;
+    private GameObject _instantiatedPokeball;
     
     [SerializeField] private AudioClip[] grassSounds;
     [SerializeField] private AudioClip[] sandSounds;
-    private AudioSource playerAS1;
+    private AudioSource _playerAs1;
     
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
 
-        playerAS1 = GetComponents<AudioSource>()[0];
-        playerAS1.volume = 0.3f;
-        playerAS1.spatialBlend = 1f;
+        _playerAs1 = GetComponents<AudioSource>()[0];
+        _playerAs1.volume = 0.3f;
+        _playerAs1.spatialBlend = 1f;
     }
 
     // Update is called once per frame
@@ -63,7 +75,7 @@ public class PlayerController : MonoBehaviour
         Transform cameraTransform = mainCamera.transform;
         
         // Grounded
-        grounded = Physics.Raycast(playerTransform.position, Vector3.down, groundCastDist);
+        _grounded = Physics.Raycast(playerTransform.position, Vector3.down, _groundCastDist);
         
         // DEBUG - Visualize raycast
         /*
@@ -82,96 +94,95 @@ public class PlayerController : MonoBehaviour
         float z = Input.GetAxis("Vertical");
         Vector3 movement = (playerTransform.right * x) + (playerTransform.forward * z);
         
-        // Throw
-        if (Input.GetButtonDown("Fire1") && grounded)
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            throwing = true;
+            if (usedPokeBallPf == pokeBallPf)
+            {
+                usedPokeBallPf = masterBallPf;
+            }
+            else
+            {
+                usedPokeBallPf = pokeBallPf;
+            }
+        }
+        
+        // Throw
+        if (Input.GetButtonDown("Fire1") && _grounded)
+        {
+            _throwing = true;
             SpawnPokeballToBone();
-            playerAnimator.SetBool("IsThrowing", true);
+            playerAnimator.SetBool(IsThrowing, true);
         }
         
         // Apply movement
-        if (!throwing)
+        if (!_throwing)
         {
             // Regular movement and running
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                controller.Move(movement * runSpeed * Time.deltaTime);
-                playerAnimator.SetBool("IsRunning", true);
-                playerAS1.volume = 0.25f; // Louder footsteps when running
+                controller.Move(movement * (runSpeed * Time.deltaTime));
+                playerAnimator.SetBool(IsRunning, true);
+                _playerAs1.volume = 0.25f; // Louder footsteps when running
             }
             else
             {
-                controller.Move(movement * speed * Time.deltaTime);
-                playerAnimator.SetBool("IsRunning", false);
-                playerAS1.volume = 0.10f;
+                controller.Move(movement * (speed * Time.deltaTime));
+                playerAnimator.SetBool(IsRunning, false);
+                _playerAs1.volume = 0.10f;
             }
             
             // Gravity and jumping
-            velocity.y += gravity * Time.deltaTime;
-            if (Input.GetButtonDown("Jump") && grounded)
+            _velocity.y += _gravity * Time.deltaTime;
+            if (Input.GetButtonDown("Jump") && _grounded)
             {
-                velocity.y = Mathf.Sqrt(jumpHeight);
+                _velocity.y = Mathf.Sqrt(jumpHeight);
             }
-            controller.Move(velocity * Time.deltaTime);
-            playerAnimator.SetBool("IsJumping", !grounded);
+            controller.Move(_velocity * Time.deltaTime);
+            playerAnimator.SetBool(IsJumping, !_grounded);
         }
-        
-        if (movement.magnitude > 0)
-        {
-            playerAnimator.SetBool("IsWalking", true);
-        }
-        else
-        {
-            playerAnimator.SetBool("IsWalking", false);
-        }
-        
+
+        playerAnimator.SetBool(IsWalking, movement.magnitude > 0);
+
         // Rotate alongside the camera
         playerTransform.rotation = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up);
     }
 
     public void ThrowEnded()
     {
-        throwing = false;
-        playerAnimator.SetBool("IsThrowing", false);
+        _throwing = false;
+        playerAnimator.SetBool(IsThrowing, false);
     }
 
     private void SpawnPokeballToBone()
     {
-        if (instantiatedPokeball is null)
+        // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+        if (_instantiatedPokeball is null)
         {
-            instantiatedPokeball = Instantiate(pokeBallPF, pokeBallBone, false);
+            _instantiatedPokeball = Instantiate(usedPokeBallPf, pokeBallBone, false);
         }
     }
 
     public void ReleasePokeball()
     {
-        if (instantiatedPokeball != null)
+        if (_instantiatedPokeball != null)
         {
-            instantiatedPokeball.transform.parent = null;
-            instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
-            instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
+            _instantiatedPokeball.transform.parent = null;
+            _instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
+            _instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
             Transform cameraTransform = mainCamera.transform;
             Vector3 throwAdjustment = new Vector3(0f, 0.5f, 0f);
             Vector3 throwVector = (cameraTransform.forward + throwAdjustment) * throwStrength;
-            instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
-            instantiatedPokeball = null;
+            _instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
+            _instantiatedPokeball = null;
         }
     }
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        if (hasFocus)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
+        Cursor.lockState = hasFocus ? CursorLockMode.Locked : CursorLockMode.None;
     }
-    
-    public float[] GetTextureMix(Vector3 playerPosition, Terrain terrain)
+
+    private float[] GetTextureMix(Vector3 playerPosition, Terrain terrain)
     {
         Vector3 terrainPosition = terrain.transform.position;
         TerrainData terrainData = terrain.terrainData;
@@ -194,7 +205,7 @@ public class PlayerController : MonoBehaviour
         return cellMix;
     }
 
-    public string FootStepLayerName(Vector3 playerPosition, Terrain terrain)
+    private string FootStepLayerName(Vector3 playerPosition, Terrain terrain)
     {
         float[] cellMix = GetTextureMix(playerPosition, terrain);
         float strongestTexture = 0;
@@ -211,13 +222,14 @@ public class PlayerController : MonoBehaviour
         return terrain.terrainData.terrainLayers[maxIndex].name;
     }
 
+    // ReSharper disable once InconsistentNaming
     public void footStep()
     {
-        playerAS1.clip = grassSounds[Random.Range(0, grassSounds.Length)];
+        _playerAs1.clip = grassSounds[Random.Range(0, grassSounds.Length)];
         if (FootStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
         {
-            playerAS1.clip = sandSounds[Random.Range(0, sandSounds.Length)];
+            _playerAs1.clip = sandSounds[Random.Range(0, sandSounds.Length)];
         }
-        playerAS1.Play();
+        _playerAs1.Play();
     }
 }

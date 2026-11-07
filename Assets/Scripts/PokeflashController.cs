@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+// ReSharper disable All
 
 public class PokeflashController : MonoBehaviour
 {
@@ -8,11 +7,5 @@ public class PokeflashController : MonoBehaviour
     void Start()
     {
         Destroy(gameObject, 2.0f);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

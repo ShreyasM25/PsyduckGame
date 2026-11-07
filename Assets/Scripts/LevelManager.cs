@@ -1,26 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class LevelManager : MonoBehaviour
 {
-    private int amountOfPokemon;
-    private int amountOfPokemonCaught;
-    private int startingAmountOfPokemon;
+    private int _amountOfPokemon;
+    private int _amountOfPokemonCaught;
 
     public float currentTime;
     public float endTime;
 
-    private GUIManager GUI;
+    private GUIManager _gui;
     
     // Start is called before the first frame update
     void Start()
     {
         Time.timeScale = 1;
-        amountOfPokemon = GameObject.FindGameObjectsWithTag("Pokemon").Length;
-        startingAmountOfPokemon = amountOfPokemon;
+        _amountOfPokemon = GameObject.FindGameObjectsWithTag("Pokemon").Length;
         endTime = 240f;
-        GUI = GameObject.Find("GUI").GetComponent<GUIManager>();
+        _gui = GameObject.Find("GUI").GetComponent<GUIManager>();
     }
 
     // Update is called once per frame
@@ -29,40 +27,42 @@ public class LevelManager : MonoBehaviour
         currentTime += Time.deltaTime;
         if (currentTime >= endTime)
         {
-            endGame(" before time ran out");
+            EndGame(" before time ran out");
         }
     }
 
-    public void removePokemon(GameObject pokemon, bool capture)
+    // ReSharper disable Unity.PerformanceAnalysis
+    public void RemovePokemon(GameObject pokemon, bool capture)
     {
         Destroy(pokemon);
-        amountOfPokemon--;
+        _amountOfPokemon--;
         if (capture)
         {
-            amountOfPokemonCaught++;
-            GUI.ReportToPlayer("Success!", amountOfPokemon + " remaining", 2.0f);
+            _amountOfPokemonCaught++;
+            _gui.ReportToPlayer("Success!", _amountOfPokemon + " remaining", 2.0f);
         }
         else
         {
-            GUI.ReportToPlayer("A Psyduck escaped!", amountOfPokemon + " remaining", 2.0f);
+            _gui.ReportToPlayer("A Psyduck escaped!", _amountOfPokemon + " remaining", 2.0f);
         }
-        if (amountOfPokemon <= 0)
+        if (_amountOfPokemon <= 0)
         {
-            endGame(" before they all escaped");
+            EndGame(" before they all escaped");
         }
     }
 
-    public void endGame(string reason)
+    // ReSharper disable Unity.PerformanceAnalysis
+    private void EndGame(string reason)
     {
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
-        if (amountOfPokemonCaught == 1)
+        if (_amountOfPokemonCaught == 1)
         {
-            GUI.ReportToPlayer("Well done!", "You have captured " + amountOfPokemonCaught + " Psyduck ", reason);
+            _gui.ReportToPlayer("Well done!", "You have captured " + _amountOfPokemonCaught + " Psyduck ", reason);
         }
         else
         {
-            GUI.ReportToPlayer("Well done!", "You have captured " + amountOfPokemonCaught + " Psyducks ", reason);
+            _gui.ReportToPlayer("Well done!", "You have captured " + _amountOfPokemonCaught + " Psyducks ", reason);
         }
     }
 }

@@ -812,7 +812,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d150c32b392e4b24292fee781fab3681, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -2030,6 +2030,18 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 2127918788104430419, guid: 00dec19a19dea8a41b06dc2082e83d80,
         type: 3}
+      propertyPath: pokeBallPf
+      value: 
+      objectReference: {fileID: 6445265519666675069, guid: 99718563fb7de924ca5d99a1235e0ba1,
+        type: 3}
+    - target: {fileID: 2127918788104430419, guid: 00dec19a19dea8a41b06dc2082e83d80,
+        type: 3}
+      propertyPath: masterBallPf
+      value: 
+      objectReference: {fileID: 3645713546171786317, guid: a93b4959dd85f954eb60aa7122ccca9b,
+        type: 3}
+    - target: {fileID: 2127918788104430419, guid: 00dec19a19dea8a41b06dc2082e83d80,
+        type: 3}
       propertyPath: pokeBallBone
       value: 
       objectReference: {fileID: 1021003443}
@@ -2038,5 +2050,11 @@ PrefabInstance:
       propertyPath: playerAnimator
       value: 
       objectReference: {fileID: 2140329538}
+    - target: {fileID: 2127918788104430419, guid: 00dec19a19dea8a41b06dc2082e83d80,
+        type: 3}
+      propertyPath: usedPokeBallPf
+      value: 
+      objectReference: {fileID: 6445265519666675069, guid: 99718563fb7de924ca5d99a1235e0ba1,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 00dec19a19dea8a41b06dc2082e83d80, type: 3}

@@ -1,13 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
+// ReSharper disable All
 
 public class PokemonController : MonoBehaviour
 {
+    private static readonly int Saunter = Animator.StringToHash("Saunter");
+    private static readonly int Flee = Animator.StringToHash("Flee");
+    private static readonly int Dig = Animator.StringToHash("Dig");
 
     private enum State
     {
@@ -16,53 +16,53 @@ public class PokemonController : MonoBehaviour
 
     [SerializeField]
     private State currentState;
-    private bool transitionActive;
+    private bool _transitionActive;
 
     [SerializeField]
     private Vector3 currentDestination;
     
     [SerializeField]
     private float runSpeed;
-    private float walkingSpeed;
+    private float _walkingSpeed;
 
-    private float viewAngle = 0.25f;
-    private float viewDistance = 5f;
+    private readonly float _viewAngle = 0.25f;
+    private readonly float _viewDistance = 5f;
     
-    private GameObject trainer;
-    private Animator pokemonAnimator;
+    private GameObject _trainer;
+    private Animator _pokemonAnimator;
 
-    private LevelManager levelmanager;
+    private LevelManager _levelmanager;
 
     [SerializeField] private AudioClip[] psySounds;
     [SerializeField] private AudioClip[] grassSounds;
     [SerializeField] private AudioClip[] sandSounds;
     [SerializeField] private AudioClip[] panicSounds;
-    private AudioSource pokemonAS1;
-    private AudioSource pokemonAS2;
+    private AudioSource _pokemonAs1;
+    private AudioSource _pokemonAs2;
 
-    private bool shutUp;
+    private bool _shutUp;
     
     // Start is called before the first frame update
     void Start()
     {
-        levelmanager = GameObject.Find("Level Manager").GetComponent<LevelManager>();
-        trainer = GameObject.Find("Trainer");
-        walkingSpeed = GetComponent<NavMeshAgent>().speed;
-        pokemonAnimator = GetComponent<Animator>();
-        switchToState(State.Chill);
+        _levelmanager = GameObject.Find("Level Manager").GetComponent<LevelManager>();
+        _trainer = GameObject.Find("Trainer");
+        _walkingSpeed = GetComponent<NavMeshAgent>().speed;
+        _pokemonAnimator = GetComponent<Animator>();
+        SwitchToState(State.Chill);
 
-        pokemonAS1 = GetComponents<AudioSource>()[0];
-        pokemonAS1.volume = 1f;
-        pokemonAS1.spatialBlend = 1f;
-        pokemonAS1.maxDistance = 5f;
+        _pokemonAs1 = GetComponents<AudioSource>()[0];
+        _pokemonAs1.volume = 1f;
+        _pokemonAs1.spatialBlend = 1f;
+        _pokemonAs1.maxDistance = 5f;
         
-        pokemonAS2 = GetComponents<AudioSource>()[1];
-        pokemonAS2.volume = 0.25f;
-        pokemonAS2.spatialBlend = 1f;
-        pokemonAS2.maxDistance = 5f;
+        _pokemonAs2 = GetComponents<AudioSource>()[1];
+        _pokemonAs2.volume = 0.25f;
+        _pokemonAs2.spatialBlend = 1f;
+        _pokemonAs2.maxDistance = 5f;
 
-        shutUp = true;
-        Invoke("resetShutUp", Random.Range(5f, 20f));
+        _shutUp = true;
+        Invoke(nameof(ResetShutUp), Random.Range(5f, 20f));
     }
 
     // Update is called once per frame
@@ -71,156 +71,145 @@ public class PokemonController : MonoBehaviour
         switch (currentState)
         {
             case State.Chill:
-                playSound(State.Chill);
-                if (transitionActive)
+                PlaySound(State.Chill);
+                if (_transitionActive)
                 {
                     currentDestination = transform.position;
                     GetComponent<NavMeshAgent>().destination = currentDestination;
-                    Invoke("switchToSaunter", Random.Range(5.0f, 6.0f));
-                    updatePokemonAnimator(false, false, false);
+                    Invoke(nameof(SwitchToSaunter), Random.Range(5.0f, 6.0f));
+                    UpdatePokemonAnimator(false, false, false);
                     GetComponent<NavMeshAgent>().speed = 0.0f;
-                    transitionActive = false;
+                    _transitionActive = false;
                 }
-                if (inView(trainer, viewAngle, viewDistance))
+                if (InView(_trainer, _viewAngle, _viewDistance))
                 {
-                    switchToState(State.Flee);
+                    SwitchToState(State.Flee);
                 }
                 break;
             
             case State.Saunter:
-                playSound(State.Saunter);
-                if (transitionActive)
+                PlaySound(State.Saunter);
+                if (_transitionActive)
                 {
-                    currentDestination = validDestination(false);
+                    currentDestination = ValidDestination(false);
                     GetComponent<NavMeshAgent>().destination = currentDestination;
-                    updatePokemonAnimator(true, false, false);
-                    GetComponent<NavMeshAgent>().speed = walkingSpeed;
-                    transitionActive = false;
+                    UpdatePokemonAnimator(true, false, false);
+                    GetComponent<NavMeshAgent>().speed = _walkingSpeed;
+                    _transitionActive = false;
                 }
                 if ((transform.position - currentDestination).magnitude < 2.5f)
                 {
-                    switchToState(State.Chill);
+                    SwitchToState(State.Chill);
                 }
-                if (inView(trainer, viewAngle, viewDistance))
+                if (InView(_trainer, _viewAngle, _viewDistance))
                 {
-                    switchToState(State.Flee);
+                    SwitchToState(State.Flee);
                 }
                 break;
 
             case State.Flee:
-                playSound(State.Flee);
-                if (transitionActive)
+                PlaySound(State.Flee);
+                if (_transitionActive)
                 {
-                    CancelInvoke("switchToSaunter");
-                    Invoke("checkForDig", 10f);
-                    currentDestination = validDestination(true);
+                    CancelInvoke(nameof(SwitchToSaunter));
+                    Invoke(nameof(CheckForDig), 10f);
+                    currentDestination = ValidDestination(true);
                     GetComponent<NavMeshAgent>().destination = currentDestination;
-                    updatePokemonAnimator(false, true, false);
+                    UpdatePokemonAnimator(false, true, false);
                     GetComponent<NavMeshAgent>().speed = runSpeed;
-                    transitionActive = false;
+                    _transitionActive = false;
                 }
                 if ((transform.position - currentDestination).magnitude < 2.5f)
                 {
-                    CancelInvoke("checkForDig");
-                    checkForDig();
+                    CancelInvoke(nameof(CheckForDig));
+                    CheckForDig();
                 }
                 break;
             
             case State.Dig:
-                if (transitionActive)
+                if (_transitionActive)
                 {
                     currentDestination = transform.position;
                     GetComponent<NavMeshAgent>().speed = 0.0f;
-                    updatePokemonAnimator(false, false, true);
-                    transitionActive = false;
+                    UpdatePokemonAnimator(false, false, true);
+                    _transitionActive = false;
                 }
                 break;
         }
     }
 
-    void switchToState(State newState)
+    void SwitchToState(State newState)
     {
-        transitionActive = true;
+        _transitionActive = true;
         currentState = newState;
     }
 
-    void switchToSaunter()
+    void SwitchToSaunter()
     {
-        switchToState(State.Saunter);
+        SwitchToState(State.Saunter);
     }
 
     private void OnDisable()
     {
-        CancelInvoke("switchToSaunter");
-        CancelInvoke("checkForDig");
-        switchToState(State.Flee);
+        CancelInvoke(nameof(SwitchToSaunter));
+        CancelInvoke(nameof(CheckForDig));
+        SwitchToState(State.Flee);
     }
 
-    void checkForDig()
+    void CheckForDig()
     {
-        if ((transform.position - trainer.transform.position).magnitude > 25f)
-        {
-            switchToState(State.Chill);
-        }
-        else
-        {
-            switchToState(State.Dig);
-        }
+        SwitchToState((transform.position - _trainer.transform.position).magnitude > 25f ? State.Chill : State.Dig);
     }
 
-    public void digCompleted()
+    public void DigCompleted()
     {
-        levelmanager.removePokemon(gameObject, false);
+        _levelmanager.RemovePokemon(gameObject, false);
     }
 
-    void updatePokemonAnimator(bool saunter, bool flee, bool dig)
+    void UpdatePokemonAnimator(bool saunter, bool flee, bool dig)
     {
-        pokemonAnimator.SetBool("Saunter", saunter);
-        pokemonAnimator.SetBool("Flee", flee);
-        pokemonAnimator.SetBool("Dig", dig);
+        _pokemonAnimator.SetBool(Saunter, saunter);
+        _pokemonAnimator.SetBool(Flee, flee);
+        _pokemonAnimator.SetBool(Dig, dig);
     }
     
-    void playSound(State currentState)
+    void PlaySound(State curState)
     {
-        if (currentState == State.Chill || currentState == State.Saunter)
+        if (curState == State.Chill || curState == State.Saunter)
         {
-            pokemonAS1.loop = false;
-            if (!shutUp)
+            _pokemonAs1.loop = false;
+            if (!_shutUp)
             {
                 if (Random.Range(1, 10) == 1)
                 {
-                    pokemonAS1.clip = psySounds[Random.Range(0, psySounds.Length)];
-                    pokemonAS1.Play();
-                    shutUp = true;
-                    Invoke("resetShutUp", Random.Range(5f, 20f));
+                    _pokemonAs1.clip = psySounds[Random.Range(0, psySounds.Length)];
+                    _pokemonAs1.Play();
+                    _shutUp = true;
+                    Invoke("ResetShutUp", Random.Range(5f, 20f));
                 }
             }
         }
 
-        if (currentState == State.Flee)
-        {
-            if (transitionActive)
-            {
-                pokemonAS1.clip = panicSounds[Random.Range(0, panicSounds.Length)];
-                pokemonAS1.loop = true;
-                pokemonAS1.Play();
-            }
-        }
+        if (curState != State.Flee) return;
+        if (!_transitionActive) return;
+        _pokemonAs1.clip = panicSounds[Random.Range(0, panicSounds.Length)];
+        _pokemonAs1.loop = true;
+        _pokemonAs1.Play();
     }
 
-    void resetShutUp()
+    private void ResetShutUp()
     {
-        shutUp = false;
+        _shutUp = false;
     }
 
-    Vector3 validDestination(bool avoidTrainer)
+    private Vector3 ValidDestination(bool avoidTrainer)
     {
         float[,] boundaries = { { -70f, 40f }, { 0f, 70f } };
         float x = Random.Range(boundaries[0, 0], boundaries[0, 1]);
         float z = Random.Range(boundaries[1, 0], boundaries[1, 1]);
         if (avoidTrainer)
         {
-            if (trainer.transform.position.x - boundaries[0, 0] >= boundaries[0, 1] - trainer.transform.position.x)
+            if (_trainer.transform.position.x - boundaries[0, 0] >= boundaries[0, 1] - _trainer.transform.position.x)
             {
                 x = boundaries[0, 0];
             }
@@ -228,20 +217,14 @@ public class PokemonController : MonoBehaviour
             {
                 x = boundaries[0, 1];
             }
-            if (trainer.transform.position.z - boundaries[1, 0] >= boundaries[1, 1] - trainer.transform.position.z)
-            {
-                z = boundaries[1, 0];
-            }
-            else
-            {
-                z = boundaries[1, 1];
-            }
+
+            z = _trainer.transform.position.z - boundaries[1, 0] >= boundaries[1, 1] - _trainer.transform.position.z ? boundaries[1, 0] : boundaries[1, 1];
         } 
         Vector3 destination = new Vector3(x, Terrain.activeTerrain.SampleHeight(new Vector3(x, 0.0f, z)), z);
         return destination;
     }
 
-    bool inView(GameObject target, float viewingAngle, float viewingDistance)
+    bool InView(GameObject target, float viewingAngle, float viewingDistance)
     {
         float dotProduct = Vector3.Dot(transform.forward, Vector3.Normalize(target.transform.position - transform.position));
         float view = 1.0f - viewingAngle;
@@ -295,11 +278,11 @@ public class PokemonController : MonoBehaviour
 
     public void footStep()
     {
-        pokemonAS2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
+        _pokemonAs2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
         if (FootStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
         {
-            pokemonAS2.clip = sandSounds[Random.Range(0, sandSounds.Length)];
+            _pokemonAs2.clip = sandSounds[Random.Range(0, sandSounds.Length)];
         }
-        pokemonAS2.Play();
+        _pokemonAs2.Play();
     }
 }
