@@ -275,12 +275,15 @@ MonoBehaviour:
   controller: {fileID: 2127918788104430416}
   mainCamera: {fileID: 0}
   playerAnimator: {fileID: 0}
-  pokeBallPF: {fileID: 0}
+  pokeBallPf: {fileID: 0}
+  masterBallPf: {fileID: 0}
+  usedPokeBallPf: {fileID: 0}
   pokeBallBone: {fileID: 0}
   speed: 2
   runSpeed: 5
-  jumpHeight: 20
+  jumpHeight: 15
   throwStrength: 4
+  masterballCount: 3
   grassSounds:
   - {fileID: 8300000, guid: 20c4b590a052e384a9552a3142137f9a, type: 3}
   - {fileID: 8300000, guid: 6d96df0d55528d149be0bd5e80aaa843, type: 3}

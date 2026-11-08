@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
 
     public float speed = 2f;
     public float runSpeed = 5f;
-    public float jumpHeight = 20f;
+    public float jumpHeight = 15f;
 
     // ReSharper disable once RedundantDefaultMemberInitializer
     private bool _throwing = false;
