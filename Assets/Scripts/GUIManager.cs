@@ -30,6 +30,9 @@ public class GUIManager : MonoBehaviour
     [SerializeField] private GameObject trainer;
     private int masterballCount;
     
+    [SerializeField] private AudioClip buttonPress;
+    private StyleColor originalButtonColor;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +51,8 @@ public class GUIManager : MonoBehaviour
         _returnButton = root.Q<Button>("return");
 
         _returnButton.clicked += ReturnButtonPressed;
+        _returnButton.RegisterCallback<MouseEnterEvent>(OnButtonHover);
+        _returnButton.RegisterCallback<MouseLeaveEvent>(OnButtonLeave);
         
         SetDisplay(_reportGb, false);
         SetDisplay(_timerGb, true);
@@ -81,6 +86,11 @@ public class GUIManager : MonoBehaviour
         {
             playPing();
             playedPing = true;
+        }
+
+        if (remainingTime <= 0)
+        {
+            stopMusic();
         }
     }
 
@@ -127,7 +137,20 @@ public class GUIManager : MonoBehaviour
 
     private void ReturnButtonPressed()
     {
+        _cameraAs2.clip = buttonPress;
+        _cameraAs2.Play();
         SceneManager.LoadScene("Scenes/Start");
+    }
+    
+    private void OnButtonHover(MouseEnterEvent buttonEvent)
+    {
+        originalButtonColor = _returnButton.resolvedStyle.backgroundColor;
+        _returnButton.style.backgroundColor = Color.red;
+    }
+
+    private void OnButtonLeave(MouseLeaveEvent buttonEvent)
+    {
+        _returnButton.style.backgroundColor = originalButtonColor;
     }
 
     private void SetDisplay(GroupBox gb, bool display)
@@ -154,5 +177,10 @@ public class GUIManager : MonoBehaviour
     {
         _cameraAs2.clip = timePing;
         _cameraAs2.Play();
+    }
+
+    private void stopMusic()
+    {
+        _cameraAs1.Stop();
     }
 }
