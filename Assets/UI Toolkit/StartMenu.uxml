@@ -1,5 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement style="flex-grow: 1; background-image: url(&apos;project://database/Assets/UI%20Toolkit/Images/titlescreen.jpg?fileID=2800000&amp;guid=b9387085e2671cc44a982d97711bd637&amp;type=3#titlescreen&apos;); align-items: center; justify-content: flex-end;">
-        <ui:Label text="Press Any Key to Play" display-tooltip-when-elided="true" name="CallToAction" style="position: relative; bottom: 3%; font-size: 100px; -unity-font: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days.otf?fileID=12800000&amp;guid=0c0e763d87c17ee418dbabe25d0345fa&amp;type=3#Lemon Days&apos;); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days%20SDF.asset?fileID=11400000&amp;guid=a44f0cf795c97f442acea67148c6ee45&amp;type=2#Lemon Days SDF&apos;); color: rgb(255, 204, 0); text-shadow: 3px 3px 0 rgb(0, 34, 119);" />
+        <ui:GroupBox name="topGB" style="width: 100%; height: 50%;" />
+        <ui:GroupBox name="bottomGB" style="justify-content: flex-end; width: 100%; height: 50%; align-items: center;">
+            <ui:GroupBox style="width: 100%; height: 50%; align-items: flex-end;">
+                <ui:Label text="High Score: 0" display-tooltip-when-elided="true" name="highScore" style="position: relative; bottom: 3%; font-size: 72px; -unity-font: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days.otf?fileID=12800000&amp;guid=0c0e763d87c17ee418dbabe25d0345fa&amp;type=3#Lemon Days&apos;); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days%20SDF.asset?fileID=11400000&amp;guid=a44f0cf795c97f442acea67148c6ee45&amp;type=2#Lemon Days SDF&apos;); color: rgb(255, 204, 0); text-shadow: 3px 3px 0 rgb(0, 34, 119); margin-bottom: 30px; align-items: flex-start; margin-right: 15%; margin-top: 2%;" />
+            </ui:GroupBox>
+            <ui:GroupBox style="width: 100%; height: 50%; align-items: center; justify-content: flex-end;">
+                <ui:Label text="Press Any Key to Play" display-tooltip-when-elided="true" name="CallToAction" style="position: relative; bottom: 3%; font-size: 100px; -unity-font: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days.otf?fileID=12800000&amp;guid=0c0e763d87c17ee418dbabe25d0345fa&amp;type=3#Lemon Days&apos;); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days%20SDF.asset?fileID=11400000&amp;guid=a44f0cf795c97f442acea67148c6ee45&amp;type=2#Lemon Days SDF&apos;); color: rgb(255, 204, 0); text-shadow: 3px 3px 0 rgb(0, 34, 119); margin-bottom: 30px;" />
+            </ui:GroupBox>
+        </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>

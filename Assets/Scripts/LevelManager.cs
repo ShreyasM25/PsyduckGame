@@ -64,5 +64,9 @@ public class LevelManager : MonoBehaviour
         {
             _gui.ReportToPlayer("Well done!", "You have captured " + _amountOfPokemonCaught + " Psyducks ", reason);
         }
+        if (_amountOfPokemonCaught > GlobalVariableManager.HighScore)
+        {
+            GlobalVariableManager.HighScore = _amountOfPokemonCaught;
+        }
     }
 }
