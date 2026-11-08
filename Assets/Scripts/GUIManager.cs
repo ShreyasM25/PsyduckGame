@@ -6,10 +6,11 @@ using UnityEngine.UIElements;
 public class GUIManager : MonoBehaviour
 {
 
-    private bool remainingTime;
+    private float remainingTime;
     
     private GroupBox _timerGb;
     private Label _time;
+    private Label _masterballCounter;
 
     private GroupBox _reportGb;
     private Label _titleLabel;
@@ -25,6 +26,9 @@ public class GUIManager : MonoBehaviour
     [SerializeField] private AudioClip timePing;
     private AudioSource _cameraAs1;
     private AudioSource _cameraAs2;
+
+    [SerializeField] private GameObject trainer;
+    private int masterballCount;
     
     // Start is called before the first frame update
     void Start()
@@ -35,6 +39,7 @@ public class GUIManager : MonoBehaviour
         
         _timerGb = root.Q<GroupBox>("timer");
         _time = root.Q<Label>("time");
+        _masterballCounter = root.Q<Label>("masterballCounter");
         
         _reportGb = root.Q<GroupBox>("report");
         _titleLabel = root.Q<Label>("title");
@@ -54,11 +59,14 @@ public class GUIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float remainingTime = _levelmanager.endTime - _levelmanager.currentTime;
+        masterballCount = trainer.GetComponent<PlayerController>().masterballCount;
+        
+        remainingTime = _levelmanager.endTime - _levelmanager.currentTime;
         
         if (GetDisplay())
         {
             _time.text = remainingTime.ToString("0");
+            _masterballCounter.text = masterballCount.ToString("0") + " Master Balls remaining";
         }
 
         if (remainingTime < 10 && !playedMusic)

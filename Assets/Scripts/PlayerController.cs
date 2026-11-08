@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
     private bool _throwing = false;
     public float throwStrength = 4f;
     private GameObject _instantiatedPokeball;
+    public int masterballCount = 3;
     
     [SerializeField] private AudioClip[] grassSounds;
     [SerializeField] private AudioClip[] sandSounds;
@@ -158,7 +159,18 @@ public class PlayerController : MonoBehaviour
         // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
         if (_instantiatedPokeball is null)
         {
-            _instantiatedPokeball = Instantiate(usedPokeBallPf, pokeBallBone, false);
+            if (usedPokeBallPf == masterBallPf)
+            {
+                if (masterballCount > 0)
+                {
+                    masterballCount--;
+                    _instantiatedPokeball = Instantiate(usedPokeBallPf, pokeBallBone, false);
+                }
+            }
+            else
+            {
+                _instantiatedPokeball = Instantiate(usedPokeBallPf, pokeBallBone, false);
+            }
         }
     }
 

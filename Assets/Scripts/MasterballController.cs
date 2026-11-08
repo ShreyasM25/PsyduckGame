@@ -17,8 +17,6 @@ public class MasterballController : MonoBehaviour
     private int _animationStage;
     private bool _didOnce;
     private Transform _trainer;
-    private bool _escaped;
-    private bool _checkForEscape = true;
     private LevelManager _levelmanager;
 
     [FormerlySerializedAs("clip_Hit")] [SerializeField] private AudioClip clipHit;
@@ -104,20 +102,6 @@ public class MasterballController : MonoBehaviour
                     component.isKinematic = true;
                     pokeballAnimator.SetInteger(State, 2);
                     pokeballAnimator.speed = 1.5f;
-
-                    if (_checkForEscape)
-                    {
-                        int r = Random.Range(1, 10);
-                        if (r == 1)
-                        {
-                            _escaped = true;
-                            pokeballAnimator.speed = 0;
-                            _didOnce = false;
-                            _animationStage = 6;
-                        }
-                        StartCoroutine(WaitForCheck(1));
-                        _checkForEscape = false;
-                    }
                     
                     if (pokeballAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 3.0f &&
                         pokeballAnimator.GetCurrentAnimatorStateInfo(0).IsName("AN_Masterball_Wiggle"))
@@ -129,26 +113,11 @@ public class MasterballController : MonoBehaviour
                     break;
                 
                 case 6: // Escape or not
-                    if (_escaped)
+                    if (!_didOnce)
                     {
-                        if (!_didOnce)
-                        { 
-                            Instantiate(pokeflashPf, _pokemon.transform.position, quaternion.identity);
-                            _pokeballAs1.clip = clipEscape;
-                            _pokeballAs1.Play();
-                            _didOnce = true;
-                        }
-                        Destroy(gameObject);
-                        _pokemon.SetActive(true);
-                    }
-                    else
-                    {
-                        if (!_didOnce)
-                        {
-                            _pokeballAs1.clip = clipSuccess;
-                            _pokeballAs1.Play();
-                            _didOnce = true;
-                        }
+                        _pokeballAs1.clip = clipSuccess;
+                        _pokeballAs1.Play();
+                        _didOnce = true;
                         _levelmanager.RemovePokemon(_pokemon, true);
                     }
                     _disableCollisionSounds = false;
@@ -182,11 +151,5 @@ public class MasterballController : MonoBehaviour
     {
         _pokeballAs1.clip = clipWiggle;
         _pokeballAs1.Play();
-    }
-    
-    IEnumerator WaitForCheck(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        _checkForEscape = true;
     }
 }

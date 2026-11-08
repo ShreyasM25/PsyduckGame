@@ -1793,6 +1793,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   intenseMusic: {fileID: 8300000, guid: 97617c8c80a0e174d9f8fdfb7b278e85, type: 3}
   timePing: {fileID: 8300000, guid: a153d496cd0ef4140992a608714ac6fb, type: 3}
+  trainer: {fileID: 2140329535}
 --- !u!1 &1442344008
 GameObject:
   m_ObjectHideFlags: 0
